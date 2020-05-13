@@ -1,0 +1,15 @@
+,Date,Study,Study Link,Journal,Population,Timeline Modeled,Baseline Scenario,With Intervention,Study Type
+0,2020-03-25,"The effect of control strategies to reduce social mixing on outcomes of the COVID-19 epidemic in Wuhan, China: a modelling study The Lancet Public Health",https://doi.org/10.1016/S2468-2667(20)30073-6,Lancet Pub Health,"Wuhan, China",1 year modeling period,Not provided,"92% reduction in infections (IQR 66–97) and 24% (13–90) in mid-2020 and end-2020,",Modeling Study
+1,2020-03-23,Interventions to mitigate early spread of SARS-CoV-2 in Singapore: a modelling study The Lancet Infectious Diseases,https://doi.org/10.1016/S1473-3099(20)30162-6,Lancet Infect Dis,Singapore,Day 80,"R0 = 1.5 270,000 people infected (7.4% population)","4,000 infected",Modeling Study
+2,2020-03-23,The Effectiveness of Social Distancing in Mitigating COVID-19 Spread: a modelling analysis medrxiv,https://doi.org/10.1101/2020.03.20.20040055,MedRxiv,"Newcastle, Australia",10 week model accounding for activation delays,"66% infection rate (179,788 infected individuals)  - no activation delay","50% Workplace Non-attendance (WN) : 58.77% IR (160,085); 90% WN: 48.89% IR (133,181) ",Modeling Study
+3,,,,,,,1 week delay,"50% WN : 58.75% IR (160,044); 90% WN: 48.93% IR (133,283) ",
+4,,,,,,,2 week delay,"50% WN : 58.80% IR (160,182); 90% WN: 48.86% IR (133,109) ",
+5,,,,,,,3 week delay,"50% WN : 58.70% IR (159,901); 90% WN: 48.86% IR (133,100) ",
+6,,,,,,,4 week delay,"50% WN : 58.71% IR (159,940); 90% WN: 48.75% IR (132,794) ",
+7,,,,,,,5 week delay,"50% WN : 58.69% IR (159,874); 90% WN: 48.97% IR (133,407) ",
+8,,,,,,,6 week delay,"50% WN : 58.69% IR (159,877); 90% WN: 48.91% IR (133,247) ",
+9,,,,,,,7 week delay,"50% WN : 58.69% IR (160,008); 90% WN: 48.91% IR (133,278) ",
+10,,,,,,,8 week delay,"50% WN : 58.74% IR (160,389); 90% WN: 48.93% IR (133,777) ",
+11,,,,,,,9 week delay,"50% WN : 58.88% IR (160,285); 90% WN: 49.11% IR (134,473) ",
+12,,,,,,,10 week delay,"50% WN : 58.84% IR (160,728); 90% WN: 49.36% IR (135,223) ",
+13,2020-02-11,Spatially Explicit Modeling of 2019-nCoV Epidemic Trend based on Mobile Phone Data in Mainland China,https://doi.org/10.1101/2020.02.09.20021360,MedRxiv,Mainland China,"Feb. 11, 2020 - Mar. 12, 2020","Current trend maintained: 72,172 infected","Resumption of work: 149,774 infected",Modeling Study

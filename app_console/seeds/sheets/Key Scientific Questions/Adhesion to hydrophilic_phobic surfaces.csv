@@ -1,0 +1,5 @@
+,Date,Study,Study Link,Journal,Surface,Does Virus persist on surface,Hydrophobic or Hydrophilic,Time of persistence
+0,2020-03-13,Aerosol and surface stability of HCoV-19 (SARS-CoV-2) compared to SARS-CoV-1,https://doi.org/10.1101/2020.03.09.20033217,The New England Journal of Medicine,Plastic,Yes,Hydrophobic,72.0
+1,2020-03-13,Aerosol and surface stability of HCoV-19 (SARS-CoV-2) compared to SARS-CoV-1,https://doi.org/10.1101/2020.03.09.20033217,The New England Journal of Medicine,Stainless Steel,Yes,Hydrophobic,72.0
+2,2020-03-13,Aerosol and surface stability of HCoV-19 (SARS-CoV-2) compared to SARS-CoV-1,https://doi.org/10.1101/2020.03.09.20033217,The New England Journal of Medicine,Copper,Yes,Hydrophobic,4.0
+3,2020-03-13,Aerosol and surface stability of HCoV-19 (SARS-CoV-2) compared to SARS-CoV-1,https://doi.org/10.1101/2020.03.09.20033217,The New England Journal of Medicine,Cardboard,Yes,Hydrophilic,24.0

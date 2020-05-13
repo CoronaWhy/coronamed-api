@@ -1,0 +1,4 @@
+,Date,Study,Study Link,Journal,Days,IQR (Days),Sample (n),Study Type,Confirmation
+0,2020-03-24,Viral Kinetics and Antibody Responses in Patients with COVID-19,https://www.medrxiv.org/content/10.1101/2020.03.24.20042382v1.full.pdf,MedRxiv,"12 (nasopharyngeal swabs), 19 (sputum), and 18 (stool)","3-38 (nasopharyngeal swabs), 5-37 (sputum), 7-26 (stool)",67.0,Prospective Cohort,
+1,2020-03-11,Clinical course and risk factors for mortality of adult inpatients with COVID-19 in Wuhan China: a retrospective cohort study,https://www.thelancet.com/action/showPdf?pii=S0140-6736%2820%2930566-3,The Lancet,20 (throat swabs),17.0-24.0,191.0,retrospective cohort,
+2,2020-02-19,COVID-19 in a Designated Infectious Diseases Hospital Outside Hubei Province China,https://www.medrxiv.org/content/10.1101/2020.02.17.20024018v1.full.pdf,MedRxiv,14 (nasal swabs),10-19,298.0,retrospective cohort,

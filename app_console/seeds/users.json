@@ -1,0 +1,19 @@
+{
+	"MODEL_NAME": "Sheet",
+	"WRITE_MODE": "single",
+	"DATA_LIST": [{
+		"_id": "5d3826e0468e4cf35236ef1a",
+		"name": "Andrew L.",
+		"email": "men232@yandex.ua",
+		"password": "Asdasd!@#",
+		"apikey": "eNdfN3q8hMSSextOYVb7I7PLDigt3zLN",
+		"roles": ["ROLE_ADMIN"]
+	}, {
+		"_id": "5d38271309568154a49b3099",
+		"name": "Artur",
+		"email": "artur@colab.la",
+		"password": "Asdasd!@#",
+		"apikey": "OZtlRzveP0lQR0HMI9Iut6YVpYSEfnQW",
+		"roles": ["ROLE_ADMIN"]
+	}]
+}

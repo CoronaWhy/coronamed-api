@@ -1,0 +1,36 @@
+,Date,Study,Study Link,Journal,Population,Timeline Modeled,Baseline Scenario,With Intervention,Study Type
+0,2020-04-15,Household Secondary Attack Rate of COVID-19 and Associated Determinants,https://doi.org/10.1101/2020.04.11.20056010,MedRxiv,Guangzhou - 335 cases and 1938 noninfected contacts,"cases reported by Feb 17, 2020",a COVID-19 case infected 0.48 (95% CI: 0.39-0.58) close contacts,"had isolation not been implemented, this number increases to 0.62 (95% CI: 0.51-0.75)",Modeling Study
+1,2020-04-14,A Stratified Model to Quantify the Effects of Containment Policies on the Spread of COVID-19,https://doi.org/10.1101/2020.04.10.20060681,MedRxiv,"Iran assuming 1 in 10,000 in population are infectious on day 1",first 90 days COVID-19 spread,uncontained:  eventual removed ratio 65.29%; maximum instantaneous infectious ration 11.03%; R0 2.28,social distancing:  eventual removed ratio 9.46%;  maximum instantaneous infectious ration 3.72% R0 0.49,Modeling Study
+2,2020-04-12,Transmission dynamics of SARS-COV-2 in China: impact of public health interventions,https://www.medrxiv.org/content/10.1101/2020.03.24.20036285v1,MedRxiv,"Mainland, China",Jan 22nd - Jan 30th,"3.38 reproduction number (95% CI, 3.25–3.48)",0.5 reproduction number,Modeling Study
+3,2020-04-07,A hybrid multi-scale model of COVID-19 transmission dynamics to assess the potential of non-pharmaceutical interventions,https://doi.org/10.1101/2020.04.05.20054460,MedRxiv,Italy,"March 30, 2020",98.4 % of the population will be infected,"If 80% of the population stayed home, there would be an infection rate of 30%",Modeling Study
+4,2020-04-06,Sustainable social distancing through facemask use and testing during the Covid-19 pandemic,https://doi.org/10.1101/2020.04.01.20049981,MedRxiv,10 million individuals modeled,,R0 = 2.4,65% effective social protection R < 1,Modeling Study
+5,2020-03-30,Dynamic Modeling to Identify Mitigation Strategies for Covid-19 Pandemic,https://doi.org/10.1101/2020.03.27.20045237,MedRxiv,"World population outside of China (6,384,063,104)",Jan 22nd - March 12th,,29.42% reduction in infection rate,Modeling Study
+6,2020-03-25,"The effect of control strategies to reduce social mixing on outcomes of the COVID-19 epidemic in Wuhan, China: a modelling study The Lancet Public Health",https://doi.org/10.1016/S2468-2667(20)30073-6,Lancet Pub Health,"Wuhan, China",1 year modeling period,Not provided,"92% reduction in infections (IQR 66–97) and 24% (13–90) in mid-2020 and end-2020,",Modeling Study
+7,2020-03-23,Interventions to mitigate early spread of SARS-CoV-2 in Singapore: a modelling study The Lancet Infectious Diseases,https://doi.org/10.1016/S1473-3099(20)30162-6,Lancet Infect Dis,Singapore,Day 80,"R0 = 1.5 270,000 people infected (7.4% population)","15,000 infected (94.8% decrease)",Modeling Study
+8,2020-03-23,The Effectiveness of Social Distancing in Mitigating COVID-19 Spread: a modelling analysis medrxiv,https://doi.org/10.1101/2020.03.20.20040055,MedRxiv,"Newcastle, Australia",10 week model accounding for activation delays,"66% infection rate (179,788 infected individuals) - no activation delay","30% Community contact reduction (CCR) :53.45% IR (145,592); 50% CCR: 41.45% IR (113,149); 70% CCR: 23.67% IR (64,492)",Modeling Study
+9,,,,,,,1 week delay,"30% CCR: 53.47% IR (145,647); 50% CCR: 41.57% IR (113,230); 70% CCR: 23.47% IR (64,492)",
+10,,,,,,,2 week delay,"30% CCR: 53.36% IR (145,364); 50% CCR: 41.66% IR (113,486); 70% CCR: 23.77% IR (64,492)",
+11,,,,,,,3 week delay,"30% CCR: 53.42% IR (145,524); 50% CCR: 41.40% IR (112,777); 70% CCR: 23.13% IR (64,492)",
+12,,,,,,,4 week delay,"30% CCR: 53.42% IR (145,529); 50% CCR: 41.59% IR (113,303); 70% CCR: 24.10% IR (64,492)",
+13,,,,,,,5 week delay,"30% CCR: 53.44% IR (145,586); 50% CCR: 41.44% IR (112,895); 70% CCR: 24.60% IR (64,492)",
+14,,,,,,,6 week delay,"30% CCR: 53.47% IR (145,647); 50% CCR: 41.63% IR (113,405); 70% CCR: 24.83% IR (64,492)",
+15,,,,,,,7 week delay,"30% CCR: 53.65% IR (146,137); 50% CCR: 41.78% IR (113,817); 70% CCR: 25.65% IR (64,492)",
+16,,,,,,,8 week delay,"30% CCR: 53.53% IR (145,808); 50% CCR: 42.05% IR (114,553); 70% CCR: 26.31% IR (64,492)",
+17,,,,,,,9 week delay,"30% CCR: 53.73% IR (146,372); 50% CCR: 42.38% IR (115,440); 70% CCR: 27.07% IR (64,492)",
+18,,,,,,,10 week delay,"30% CCR: 53.93% IR (146,912); 50% CCR: 43.01% IR (117,170); 70% CCR: 28.72% IR (64,492)",
+19,2020-03-18,Is a 14-day quarantine period optimal for effectively controlling coronavirus disease 2019 (COVID-19)?,https://doi.org/10.1101/2020.03.15.20036533,MedRxiv,2015 laboratory confirmed COVID-19 patients,"Jan. 1, 2020 - Feb. 25, 2020",WHO recommended 14 day quarantine,88.5% effective,Respective Cohort Analysis
+20,,,,,,,17 day quarantine,94.8% effective,
+21,,,,,,,18 day quarantine,96.2% effective,
+22,,,,,,,21 day quarantine,98.3% effective,
+23,,,,,,,70% quarantined rate,"Peak date: Feb 19th with 59,953 individuals confirmed",
+24,,,,,,,63% quarantined rate,"Peak date: Feb 20th with 64,740 individuals confirmed",
+25,2020-03-13,Predicting the cumulative number of cases for the COVID-19 epidemic in China from early data,https://doi.org/10.1101/2020.03.11.20034314,MedRxiv,"Mainland China, this is a repeat of the paper in the section above but i put it anyway",Jan 20th - Jan 29th,"Total reported cases 820,000 and unreported 200,000","Total reported cases 63,100 and unreported 94,700",Modeling Study
+26,2020-03-12,"Revealing the influence of national public health policies for the outbreak of the SARS-CoV-2 epidemic in Wuhan, China through status dynamic modeling",https://doi.org/10.1101/2020.03.10.20032995,MedRxiv,"Wuhan, China",Jan 27th - Feb 2nd,"77,453 cases in that timeline","6,536 cases in that timeline",Modeling Study
+27,2020-03-11,Modeling the epidemic dynamics and control of COVID-19 outbreak in China,https://doi.org/10.1007/s40484-020-0199-0,Quantitative Biology,"Hubei Province, China",Jan 20- Feb 21,"8,923,823 total cases","49,510 total cases",Modeling Study
+28,2020-03-03,A simple model to assess Wuhan lock-down effect and region efforts during COVID-19 epidemic in China Mainland,https://doi.org/10.1101/2020.02.29.20029561,MedRxiv,"Wuhan, China","January 24 - February 15, 2020","41,477 cases","15,768 cases",Modeling Study
+29,2020-02-13,"Early epidemiological assessment of the transmission potential and virulence of coronavirus disease 2019 (COVID-19) in Wuhan City: China, January-February, 2020",https://doi.org/10.1101/2020.02.12.20022434,MedRxiv,"Wuhan, China",January 23rd 2020,5.20 reproduction number (95%CrI: 5.04–5.47),0.58 reproduction number (95%CrI: 0.51–0.64),Modeling Study
+30,2020-02-12,Simulating the infected population and spread trend of 2019-nCov under different policy by EIR model medrxiv,https://doi.org/10.1101/2020.02.10.20021519,MedRxiv,Mainland China,"Dec. 1, 2019 - Apr. 30, 2020",100% quarantined rate,"Peak date: Feb 16th with 49,093 individuals confirmed",Modeling Study
+31,,,,,,,90% quarantined rate,"Peak date: Feb 17th with 51,605 individuals confirmed",
+32,,,,,,,80% quarantined rate,"Peak date: Feb 18th with 55,059 individuals confirmed",
+33,,,,,,,70% quarantined rate,"Peak date: Feb 19th with 59,953 individuals confirmed",
+34,,,,,,,63% quarantined rate,"Peak date: Feb 20th with 64,740 individuals confirmed",

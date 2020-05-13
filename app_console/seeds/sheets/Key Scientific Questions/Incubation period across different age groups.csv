@@ -1,0 +1,7 @@
+,Date,Study,Study Link,Journal,Days,Range (Days),Sample (n),Study Type
+0,2020-03-30,Children are unlikely to have been the primary source of household SARS-CoV-2 infections,https://doi.org/10.1101/2020.03.26.20044826,medRxiv,"7.74 ± 3.22 (mean, children)",,40 articles,meta-analysis
+1,2020-03-26,Viral Kinetics and Antibody responses in Patients with COVID-19,https://doi.org/10.1101/2020.03.24.20042382,medRxiv,"means: 10-18yr (12.0±2.7), 19-45yrs (6.3±3.0), 46-65yrs (6.8 ±3.0), and 66-77yrs (5.6±2.5)",,67,retrospective cohort
+2,2020-03-18,Is a 14-day quarantine period optimal for effectively controlling coronavirus disease 2019 (COVID-19)?,https://doi.org/10.1101/2020.03.15.20036533,medRxiv,medians: 7 (adults); 9 (children); t test p=0.02,0 to 33,2015,case series
+3,2020-03-16,Clinical Characteristics of 34 Children with Coronavirus Disease-2019 in the West of China: a Multiple-center Case Series,https://doi.org/10.1101/2020.03.12.20034686,medRxiv,"10.5 (median, children)",7.75  to 25.25 (children),34,case series
+4,2020-03-12,Epidemiological and clinical characteristics of COVID-19 in adolescents and young adults,https://doi.org/10.1101/2020.03.10.20032136,medRxiv,"6.6 (mean, ages 10-35) (95% CI, 4.4, 9.6)",,46,case series
+5,2020-02-29,Estimate the incubation period of coronavirus 2019 (COVID-19),https://doi.org/10.1101/2020.02.24.20027474,medRxiv,medians: 6 (>=40 yo); 4 (<40 yo),IQR: 2 to 10 (>=40 yo); 3 to 5 (<40 yo),59,case series

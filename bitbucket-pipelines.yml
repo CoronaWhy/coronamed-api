@@ -1,0 +1,13 @@
+image: node:6
+clone:
+  depth: full
+pipelines:
+  branches:
+    master:
+      - step:
+          script:
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME_PROD.git master
+    stage:
+      - step:
+          script:
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME_STAGE.git stage:master
