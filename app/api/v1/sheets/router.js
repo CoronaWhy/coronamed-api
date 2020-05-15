@@ -10,7 +10,9 @@ router
 
 	.get('/', sheets.search)
 	.get('/:id', sheets.getById)
+	.get('/:id/export/csv', sheets.exportCSV)
 	.patch('/:id/rows/plain', sheets.insertRowsByPlainText)
+	.put('/:id/rows/plain', sheets.replaceRowsByPlainText)
 	.delete('/:id', sheets.deleteById)
 ;
 
