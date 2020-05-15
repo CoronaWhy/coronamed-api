@@ -46,7 +46,7 @@
 		"koa-router": "^7.4.0",
 		"koa-static": "^5.0.0",
 		"mandrill-api": "^1.0.45",
-		"minimist": "^1.2.0",
+		"minimist": "^1.2.3",
 		"mongoose": "^5.8.7",
 		"mongoose-beautiful-unique-validation": "git+https://github.com/men232/mongoose-beautiful-unique-validation.git#patch-1",
 		"mw-authentication": "git+https://workerco:3aXno3LwK6gnBcPyEdDrVgIaJ2phG9II@bitbucket.org/workerco/mw-authentication.git#v2.0",
