@@ -1,7 +1,7 @@
 {
 	"name": "coronamed-api",
 	"version": "1.2.0",
-	"description": "API boilerplate using Koa2 and ES2017",
+	"description": "coronamed-api project",
 	"main": "./bin/http-server.js",
 	"scripts": {
 		"start": "NODE_PATH=./app node ./bin/http-server.js",
