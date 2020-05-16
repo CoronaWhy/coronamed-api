@@ -1,8 +1,9 @@
-import _set from 'lodash/set';
 import _get from 'lodash/get';
 import Promise from 'bluebird';
 
 import * as csv from '@fast-csv/format';
+
+import sheetclip from 'lib/sheetclip';
 
 import { escapeRegExp, parseSortExpression } from 'utils/str';
 import { Sheet } from 'models';
@@ -64,75 +65,28 @@ export async function exportCSV(ctx) {
 
 export async function insertRowsByPlainText(ctx) {
 	const sheet = ctx.state.sheet;
-	const text = ctx.request.body.text;
+	const input = ctx.request.body;
 
-	if (!text || typeof text !== 'string') {
-		ctx.throw(400, 'Invalid text.');
+	let arr = null;
+
+	switch (true) {
+		case Array.isArray(input):
+			arr = input;
+			break;
+
+		case typeof input === 'string':
+			arr = sheetclip.parse(input);
+			break;
+
+		default:
+			return ctx.throw(400, 'Invalid of body format. Expect array or plain-text.');
 	}
 
-	const parsedRows = text.split('\n').map(rowText => {
-		const cells = rowText
-			.split('\t')
-			.map(v => v.trim());
-
-		return cells;
-	});
-
-	const parsedHeader = parsedRows.shift();
-
-	if (!parsedHeader || !parsedHeader.length) {
+	if (arr.length < 2) {
 		ctx.throw(400, 'Invalid text format: failed to detect header.');
-	} else if (!parsedRows || !parsedRows.length) {
-		ctx.throw(400, 'Invalid text format: failed to detect rows.');
 	}
 
-	// Merge headers
-	const heaederRefs = parsedHeader.map((pHeader, index) => {
-		pHeader = (pHeader || `Cell ${index + 1}`);
-
-		let idx = sheet.header.findIndex(v =>
-			v.toLowerCase() === pHeader.toLowerCase()
-		);
-
-		if (idx < 0) {
-			idx = sheet.header.push(pHeader) - 1;
-			ctx.log('debug', 'adding header', { pHeader, idx });
-		}
-
-		return idx;
-	});
-
-	const isFirstCellIsZero = (
-		String(_get(sheet.rows, [0, 'cells', 0, 'v'])).trim() === '0'
-	);
-
-	const isFirstCellIsID = /id/i.test(sheet.header[0]);
-
-	// Adding rows
-	for(let row of parsedRows) {
-		const cells = sheet.header.map(() => ({
-			v: '',
-			t: 'string'
-		}));
-
-		const idNum = isFirstCellIsZero
-			? sheet.rows.length - 1
-			: sheet.rows.length;
-
-		for (let i = 0; i < row.length; i++) {
-			const cellValue = row[i];
-			const headerIdx = heaederRefs[i];
-
-			cells[headerIdx].v = cellValue;
-		}
-
-		if (isFirstCellIsID && !_get(cells, [0, 'v'])) {
-			_set(cells, [0, 'v'], idNum);
-		}
-
-		sheet.rows.push({ cells });
-	}
-
+	await sheet.joinArray(arr);
 	await sheet.save();
 
 	ctx.body = sheet.toJSON({ virtuals: true });
@@ -140,48 +94,28 @@ export async function insertRowsByPlainText(ctx) {
 
 export async function replaceRowsByPlainText(ctx) {
 	const sheet = ctx.state.sheet;
-	const text = ctx.request.body.text;
+	const input = ctx.request.body;
 
-	if (!text || typeof text !== 'string') {
-		ctx.throw(400, 'Invalid text.');
+	let arr = null;
+
+	switch (true) {
+		case Array.isArray(input):
+			arr = input;
+			break;
+
+		case typeof input === 'string':
+			arr = sheetclip.parse(input);
+			break;
+
+		default:
+			return ctx.throw(400, 'Invalid of body format. Expect array or plain-text.');
 	}
 
-	const parsedRows = text.split('\n').map(rowText => {
-		const cells = rowText
-			.split('\t')
-			.map(v => v.trim());
-
-		return cells;
-	});
-
-	const parsedHeader = parsedRows.shift();
-
-	sheet.header = parsedHeader;
-	sheet.rows = [];
-
-	const isFirstCellIsID = /id/i.test(sheet.header[0]);
-
-	// Adding rows
-	for(let row of parsedRows) {
-		const cells = sheet.header.map(() => ({
-			v: '',
-			t: 'string'
-		}));
-
-		const idNum = sheet.rows + 1;
-
-		for (let i = 0; i < row.length; i++) {
-			const cellValue = row[i];
-			cells[i].v = cellValue;
-		}
-
-		if (isFirstCellIsID && !_get(cells, [0, 'v'])) {
-			_set(cells, [0, 'v'], idNum);
-		}
-
-		sheet.rows.push({ cells });
+	if (arr.length < 2) {
+		ctx.throw(400, 'Invalid text format: failed to detect header.');
 	}
 
+	await sheet.replaceWithArray(arr);
 	await sheet.save();
 
 	ctx.body = sheet.toJSON({ virtuals: true });

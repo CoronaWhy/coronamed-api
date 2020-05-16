@@ -22,74 +22,84 @@ script.on('complete', () => mongoose.disconnect());
 export default script;
 
 async function doWork(params) {
-	const listPath = path.resolve('app_console', 'seeds', params.f);
-	const listFiles = glob.sync(listPath);
+	await Sheet.find()
+		.cursor()
+		.eachAsync(async doc => {
+			if (doc.category === 'Risk Factors') {
+				doc.name = 'Risk Factors ' + doc.name;
+			}
 
-	const items = [];
-
-	// Parsing CSV files
-	for(let filePath of listFiles) {
-		await new Promise((resolve) => {
-			script.log.info('parse: %s', filePath);
-
-			const rows = [];
-
-			const parsedFilePath = filePath.split(path.sep);
-
-			const name = frendlyString(
-				trimExt(parsedFilePath.pop() || 'None')
-			);
-
-			const category = frendlyString(parsedFilePath.pop());
-
-			let header = null;
-
-			csv.parseFile(filePath)
-				.on('error', err => {
-					script.log.warn('failed to parse %s with %s', filePath, err.message);
-					resolve();
-				})
-				.on('data', row => {
-					if (header) {
-						rows.push(row);
-					} else {
-						if (row.length > 0 && !row[0]) row[0] = 'ID';
-						header = row;
-					}
-				})
-				.on('end', () => {
-					items.push({ filePath, name, category, header, rows });
-					resolve();
-				});
-		});
-	}
-
-	// Insert into database
-	for(let item of items) {
-		const doc = await Sheet.findOne({
-			name: item.name,
-			category: item.category
-		}).then(doc => {
-			return doc || new Sheet();
+			await doc.save();
 		});
 
-		doc.set({
-			name: item.name,
-			category: item.category,
-			header: item.header,
-			updatedAt: new Date(),
-			rows: item.rows.map(row => ({
-				cells: row.map(cell => ({
-					v: cell,
-					t: 'string'
-				}))
-			}))
-		});
+	// const listPath = path.resolve('app_console', 'seeds', params.f);
+	// const listFiles = glob.sync(listPath);
 
-		await doc.save();
-	}
+	// const items = [];
 
-	return { amount: items.length };
+	// // Parsing CSV files
+	// for(let filePath of listFiles) {
+	// 	await new Promise((resolve) => {
+	// 		script.log.info('parse: %s', filePath);
+
+	// 		const rows = [];
+
+	// 		const parsedFilePath = filePath.split(path.sep);
+
+	// 		const name = frendlyString(
+	// 			trimExt(parsedFilePath.pop() || 'None')
+	// 		);
+
+	// 		const category = frendlyString(parsedFilePath.pop());
+
+	// 		let header = null;
+
+	// 		csv.parseFile(filePath)
+	// 			.on('error', err => {
+	// 				script.log.warn('failed to parse %s with %s', filePath, err.message);
+	// 				resolve();
+	// 			})
+	// 			.on('data', row => {
+	// 				if (header) {
+	// 					rows.push(row);
+	// 				} else {
+	// 					if (row.length > 0 && !row[0]) row[0] = 'ID';
+	// 					header = row;
+	// 				}
+	// 			})
+	// 			.on('end', () => {
+	// 				items.push({ filePath, name, category, header, rows });
+	// 				resolve();
+	// 			});
+	// 	});
+	// }
+
+	// // Insert into database
+	// for(let item of items) {
+	// 	const doc = await Sheet.findOne({
+	// 		name: item.name,
+	// 		category: item.category
+	// 	}).then(doc => {
+	// 		return doc || new Sheet();
+	// 	});
+
+	// 	doc.set({
+	// 		name: item.name,
+	// 		category: item.category,
+	// 		header: item.header,
+	// 		updatedAt: new Date(),
+	// 		rows: item.rows.map(row => ({
+	// 			cells: row.map(cell => ({
+	// 				v: cell,
+	// 				t: 'string'
+	// 			}))
+	// 		}))
+	// 	});
+
+	// 	await doc.save();
+	// }
+
+	// return { amount: items.length };
 }
 
 export function trimExt(str) {
