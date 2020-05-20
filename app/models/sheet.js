@@ -3,6 +3,12 @@ import _get from 'lodash/get';
 import mongoose from 'mongoose';
 import Promise from 'bluebird';
 
+import { castCellType } from 'services/sheets';
+
+const DB_CORD19 = process.env.NODE_ENV === 'development'
+	? mongoose
+	: mongoose.__openConnection('cord19');
+
 const Mixed = mongoose.Schema.Types.Mixed;
 
 const SchemaCell = mongoose.Schema({
@@ -24,7 +30,7 @@ const Schema = new mongoose.Schema({
 	createdAt:     { type: Date, default: Date.now, index: true },
 	updatedAt:     { type: Date, default: Date.now, index: true }
 }, {
-	collection: 'sheets',
+	collection: 'questions',
 	minimize: false,
 	versionKey: false
 });
@@ -65,6 +71,108 @@ Schema.path('category').set(function(value) {
 
 	return value;
 });
+
+Schema.virtual('isFirstHeaderID').get(function() {
+	const firstHeader = this.header[0] || '';
+
+	if (firstHeader === '') {
+		return true;
+	}
+
+	return /id/i.test(firstHeader);
+});
+
+Schema.virtual('isFirstRecordZero').get(function() {
+	return String(_get(this.rows, [0, 'cells', 0, 'v'])).trim() === '0';
+});
+
+Schema.virtual('nextRowID').get(function() {
+	const sheet = this;
+
+	return sheet.isFirstRecordZero
+		? sheet.rows.length - 1
+		: sheet.rows.length;
+});
+
+Schema.methods.addRow = function sheetAddRow(returnRow) {
+	const sheet = this;
+
+	if (!Array.isArray(sheet.rows)) {
+		sheet.rows = [];
+	}
+
+	const rowIdx = (sheet.rows.push({ cells: [] })) - 1;
+
+	return returnRow
+		? sheet.rows[rowIdx]
+		: rowIdx;
+};
+
+Schema.methods.addCell = async function sheetAddCeel(rowIdx, cellData) {
+	const sheet = this;
+	const row = sheet.rows[rowIdx];
+
+	switch (true) {
+		case !row:
+			throw new TypeError(`Sheet has no row with ${rowIdx} index.`);
+
+		case !cellData || cellData === null || typeof cellData !== 'object':
+			throw new TypeError(`CellData is not valid object.`);
+
+		case !cellData.t || typeof cellData.t !== 'string':
+			throw new TypeError(`Cell "t" property missed or not valid string.`);
+
+		case cellData.v === undefined:
+			throw new TypeError(`Cell "v" property cannot be undefined.`);
+	}
+
+	switch (true) {
+		case sheet.isFirstHeaderID && !cellData.v:
+			cellData = { v: sheet.nextRowID, t: 'number' };
+			break;
+
+		case cellData.t === 'auto':
+			cellData = await castCellType(cellData.v);
+			break;
+	}
+
+	if (
+		row.cells.length === 0 &&
+		cellData.t === 'number' &&
+		sheet.isFirstHeaderID &&
+		cellData.v !== sheet.nextRowID
+	) {
+		cellData.v = sheet.nextRowID;
+	}
+
+	const cellIdx = (row.cells.push({
+		v: cellData.v,
+		t: cellData.t
+	})) - 1;
+
+	sheet.padHeader(cellIdx + 1);
+
+	return cellIdx;
+};
+
+Schema.methods.padHeader = function sheetPadHeader(size) {
+	const sheet = this;
+
+	if (!Array.isArray(sheet.header)) {
+		sheet.header = [];
+	}
+
+	const missAmount = size - sheet.header.length;
+
+	if (missAmount <= 0) {
+		return;
+	}
+
+	for (let i = 0; i < missAmount; i++) {
+		const headerId = i + sheet.header.length + 1;
+		sheet.header.push(`Header ${headerId}`);
+	}
+};
 
 Schema.methods.joinArray = async function sheetJoinArray(arr) {
 	const sheet = this;
@@ -112,18 +220,11 @@ Schema.methods.joinArray = async function sheetJoinArray(arr) {
 		// Adding unexisted header
 		if (cellRef < 0) {
 			cellRef = sheet.header.push(joinHeader) - 1;
-			console.log('adding:', { cellRef, joinHeader });
 		}
 
 		cellRefsTaken[cellRef] = true;
 		return cellRef;
 	});
-
-	const isIDFirst = /id/i.test(sheet.header[0]);
-
-	const isIDFirstCellZero = (
-		String(_get(sheet.rows, [0, 'cells', 0, 'v'])).trim() === '0'
-	);
 
 	// Adding rows
 	for (let joinRow of joinRows) {
@@ -134,20 +235,16 @@ Schema.methods.joinArray = async function sheetJoinArray(arr) {
 		}));
 
 		// Assign first cell with auto genereted num
-		if (isIDFirst) {
-			cells[0].v = isIDFirstCellZero
-				? sheet.rows.length - 1
-				: sheet.rows.length;
+		if (sheet.isFirstHeaderID) {
+			cells[0].v = sheet.nextRowID;
 		}
 
 		for (let i = 0; i < joinRow.length; i++) {
 			const cellValue = joinRow[i];
 			const cellIdx = cellRefs[i];
 
-			cells[cellIdx].v = cellValue;
+			cells[cellIdx] = await castCellType(cellValue);
 		}
-
-		console.log('row:', cells.map(v => v.v));
 
 		sheet.rows.push({ cells });
 
@@ -168,5 +265,5 @@ Schema.methods.replaceWithArray = async function sheetReplaceWithArray(arr) {
 	await sheet.joinArray(arr);
 };
 
-const Sheet = mongoose.model('Sheet', Schema);
+const Sheet = DB_CORD19.model('Sheet', Schema);
 export default Sheet;

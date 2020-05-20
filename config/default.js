@@ -7,7 +7,7 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '::';
 
-const APP_NAME            = process.env.APP_NAME || 'koa2-api-es7-boilerplate';
+const APP_NAME            = process.env.APP_NAME || 'coronamed-api';
 const APP_SECRET          = process.env.APP_SECRET || 'app-secret-key';
 const APP_PUBLIC_ENDPOINT = process.env.APP_PUBLIC_ENDPOINT || `http://localhost:${PORT}`;
 
@@ -37,12 +37,15 @@ module.exports = {
 			main: {
 				hosts: [process.env.MONGODB_URI || `mongodb://localhost/${APP_NAME}-${NODE_ENV}`],
 				options: {}
+			},
+			cord19: {
+				hosts: [process.env.MONGODB_CORD19_URI || `mongodb://localhost/${APP_NAME}-cord19-${NODE_ENV}`]
 			}
 		},
 		// default options
 		options: {
 			autoReconnect: true,
-			autoIndex: process.env.MONGOOSE_AUTO_INDEX !== 'true',
+			autoIndex: process.env.MONGOOSE_AUTO_INDEX !== 'false',
 			reconnectTries: Number.MAX_VALUE,
 			reconnectInterval: 500,
 			poolSize: 20,

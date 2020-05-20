@@ -4,9 +4,14 @@ import Promise from 'bluebird';
 import * as csv from '@fast-csv/format';
 
 import sheetclip from 'lib/sheetclip';
+import mongoose from 'lib/mongoose';
 
 import { escapeRegExp, parseSortExpression } from 'utils/str';
+import { mapStream } from 'utils/stream';
+
 import { Sheet } from 'models';
+
+const DB_CORD19 = mongoose.__openConnection('cord19');
 
 export async function search(ctx) {
 	const params = ctx.query;
@@ -32,7 +37,55 @@ export async function search(ctx) {
 }
 
 export function getById(ctx) {
-	ctx.body = ctx.state.sheet.toJSON({ virtuals: true });
+	const result = ctx.state.sheet.toJSON({ virtuals: true });
+	delete result.rows;
+
+	ctx.body = result;
+}
+
+export async function getSheetRows(ctx) {
+	const sheet = ctx.state.sheet;
+
+	const dbStream = Sheet.aggregate([
+		{ $match: { _id: sheet._id } },
+		{ $unwind: '$rows' },
+		{ $project: { row: '$rows' } }
+	]).cursor({ batchSize: 3 }).exec();
+
+	const cordRefBuffer = {};
+
+	const cordRefGetter = async(val) => {
+		if (cordRefBuffer[val] !== undefined) {
+			return cordRefBuffer[val];
+		}
+
+		const refDoc = await DB_CORD19.collection('v19').findOne({
+			cord_uid: val
+		});
+
+		if (refDoc) {
+			cordRefBuffer[val] = resolveHttpProtocol(refDoc['doi']);
+		} else {
+			cordRefBuffer[val] = null;
+		}
+
+		return cordRefBuffer[val];
+	};
+
+	const refPopulateStream = mapStream(async({ row }) => {
+		row.cells = await Promise.map(row.cells, async cell => {
+			if (cell.t === 'cord_ref') {
+				cell.link = await cordRefGetter(cell.v);
+			}
+
+			return cell;
+		}, { concurrency: 5 });
+
+		return row;
+	});
+
+	ctx.jsonStream = true;
+	ctx.body = dbStream.pipe(refPopulateStream);
 }
 
 export async function deleteById(ctx) {
@@ -119,4 +172,12 @@ export async function replaceRowsByPlainText(ctx) {
 	await sheet.save();
 
 	ctx.body = sheet.toJSON({ virtuals: true });
+}
+
+function resolveHttpProtocol(str, defProtocol ='http') {
+	if (/^http/.test(str)) {
+		return str;
+	}
+
+	return `${defProtocol}://${str}`;
 }

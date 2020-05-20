@@ -94,6 +94,8 @@ function openConnection(connectionName) {
 		throw TypeError(`missed options for ${connectionName} connection.`);
 	}
 
+	log.debug('connect [%s]: %s', connectionName, uri);
+
 	if (connectionName === 'main') {
 		connection = mongoose.connection;
 	} else {

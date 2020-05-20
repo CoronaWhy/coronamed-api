@@ -66,27 +66,33 @@ async function doWork(params) {
 
 	// Insert into database
 	for(let item of items) {
-		const doc = await Sheet.findOne({
+		const sheet = await Sheet.findOne({
 			name: item.name,
 			category: item.category
-		}).then(doc => {
-			return doc || new Sheet();
+		}).then(sheet => {
+			return sheet || new Sheet();
 		});
 
-		doc.set({
+		sheet.set({
 			name: item.name,
 			category: item.category,
 			header: item.header,
 			updatedAt: new Date(),
-			rows: item.rows.map(row => ({
-				cells: row.map(cell => ({
-					v: cell,
-					t: 'string'
-				}))
-			}))
+			rows: []
 		});
 
-		await doc.save();
+		for(let itemRow of item.rows) {
+			const sheetRowIdx = sheet.addRow();
+
+			for(let cellValue of itemRow) {
+				await sheet.addCell(sheetRowIdx, {
+					v: cellValue,
+					t: 'auto'
+				});
+			}
+		}
+
+		await sheet.save();
 	}
 
 	return { amount: items.length };
