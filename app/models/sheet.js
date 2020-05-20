@@ -127,7 +127,7 @@ Schema.methods.addCell = async function sheetAddCeel(rowIdx, cellData) {
 	}
 
 	switch (true) {
-		case sheet.isFirstHeaderID && !cellData.v:
+		case sheet.isFirstHeaderID && !cellData.v && row.cells.length === 0:
 			cellData = { v: sheet.nextRowID, t: 'number' };
 			break;
 
