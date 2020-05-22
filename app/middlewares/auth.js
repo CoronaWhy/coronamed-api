@@ -1,5 +1,8 @@
+import _get from 'lodash/get';
+import compose from 'koa-compose';
 import Auth from 'mw-authentication';
-import { ROLE_ADMIN } from 'constants/user-roles';
+
+import ApiError from 'errors/ApiError';
 
 export const AUTH_USER = getInterface('User');
 
@@ -7,13 +10,39 @@ export const AUTH_USER = getInterface('User');
 function getInterface(modelName) {
 	const authService = new Auth(modelName);
 
+	const checkAccountDisabledFlag = (ctx, next) => {
+		const isDisabled = !!_get(ctx._user, 'disabled');
+
+		if (isDisabled) {
+			throw new ApiError('UNAUTHORIZED', `Unauthorized, account disabled.`);
+		}
+
+		return next();
+	};
+
+	const checkAccountType = (ctx, next) => {
+		const accountType = _get(ctx._user, 'constructor.modelName', null);
+
+		if (!accountType) {
+			throw new ApiError('FORBIDDEN');
+		} else if (accountType !== modelName) {
+			throw new ApiError('FORBIDDEN', `Forbidden, cannot access resource by ${accountType} account.`);
+		}
+
+		return next();
+	};
+
 	Object.assign(authService, {
 		TRY: authService.tryAuthorize('jwt'),
-		JWT: authService.authorize('jwt'),
-		API_KEY: authService.authorize('apikey'),
-		COOKIE: authService.authorize('cookie'),
-		ADMIN: authService.requireRoles([ROLE_ADMIN]),
-		REQUIRED: checkUserAccount
+		JWT: compose([authService.authorize('jwt'), checkAccountType, checkAccountDisabledFlag]),
+		API_KEY: compose([authService.authorize('apikey'), checkAccountType, checkAccountDisabledFlag]),
+		COOKIE: compose([authService.authorize('cookie') , checkAccountType, checkAccountDisabledFlag]),
+		ADMIN: compose([authService.requireRoles(['ROLE_ADMIN']), checkAccountType, checkAccountDisabledFlag]),
+		STAFF: compose([authService.requireRoles(['ROLE_ADMIN']), checkAccountType, checkAccountDisabledFlag]),
+		REQUIRED: checkUserAccount,
+		ROLES(list) {
+			return compose([authService.requireRoles(list), checkAccountType, checkAccountDisabledFlag]);
+		}
 	});
 
 	return authService;

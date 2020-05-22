@@ -26,7 +26,9 @@ const Schema = new mongoose.Schema({
 
 	apikey:   { type: String, select: false },
 	password: { type: String, select: false },
-	roles:    { type: Array, default: [DEF_ROLE] }
+	roles:    { type: Array, default: [DEF_ROLE] },
+
+	disabled: { type: Boolean, default: false }
 }, {
 	collection: 'users',
 	minimize: false,
