@@ -12,6 +12,7 @@ router
 	.param('id', ensureResourceById)
 
 	.get(   '/',                sheets.search) // eslint-disable-line
+	.get(   '/export',          sheets.exportAll) // eslint-disable-line
 	.get(   '/:id',             sheets.getById) // eslint-disable-line
 	.get(   '/:id/export/csv',  sheets.exportCSV) // eslint-disable-line
 	.get(   '/:id/rows',        sheets.getSheetRows) // eslint-disable-line

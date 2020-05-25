@@ -1,5 +1,7 @@
 import _get from 'lodash/get';
 import Promise from 'bluebird';
+import archiver from 'archiver';
+import moment from 'moment';
 
 import * as csv from '@fast-csv/format';
 
@@ -114,6 +116,42 @@ export async function exportCSV(ctx) {
 	})().catch(err => {
 		csvStream.emit('error', err);
 	});
+}
+
+export async function exportAll(ctx) {
+	// Make archive
+	const fileName = `coronamed-questions-${moment().format('YYYY-MM-DD')}.zip`;
+
+	const archive = archiver('zip', {
+		zlib: { level: 9 }
+	});
+
+	// Save doc into files
+	Sheet.find().lean().cursor().eachAsync(async sheet => {
+		const fileName = `${sheet.title}.csv`;
+		const csvStream = csv.format();
+
+		ctx.log('debug', 'export to %s', fileName);
+
+		archive.append(csvStream, { name: fileName });
+
+		for(let row of sheet.rows) {
+			csvStream.write(row.cells.map(cell => _get(cell, 'v', '')));
+			await Promise.delay(1);
+		}
+
+		csvStream.end();
+	}).catch(err => {
+		archive.emit('error', err);
+	}).then(() => {
+		archive.finalize();
+	});
+
+	ctx.set('content-disposition', `attachment; filename=${fileName}`);
+	ctx.set('content-type', 'application/zip');
+
+	ctx.rawBody = true;
+	ctx.body = archive;
 }
 
 export async function insertRowsByPlainText(ctx) {
