@@ -76,5 +76,8 @@ module.exports = {
 	},
 	mandrill: {
 		apikey: process.env.MANDRILL_API_KEY || '__none__'
+	},
+	google: {
+		apikey: process.env.GOOGLE_API_KEY
 	}
 };
