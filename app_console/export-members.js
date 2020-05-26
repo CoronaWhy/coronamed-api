@@ -70,13 +70,13 @@ async function doWork(params) {
 			continue;
 		}
 
-		if (!item.city) {
+		if (!item.city && !item.country) {
 			await writeToDB(0, 0);
 			continue;
 		}
 
 		const geoResults = await gmaps.geocode({
-			address: item.city,
+			address: item.city || item.country,
 			region: 'US'
 		}).asPromise().then(r => _get(r, 'json.results'));
 
