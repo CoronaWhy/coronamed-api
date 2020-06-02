@@ -1,4 +1,5 @@
 import _get from 'lodash/get';
+
 import Promise from 'bluebird';
 import archiver from 'archiver';
 import moment from 'moment';
@@ -6,14 +7,16 @@ import moment from 'moment';
 import * as csv from '@fast-csv/format';
 
 import sheetclip from 'lib/sheetclip';
-import mongoose from 'lib/mongoose';
+
+import {
+	cordRowPopulation,
+	publicRownTrasnform
+} from 'services/sheets';
 
 import { escapeRegExp, parseSortExpression } from 'utils/str';
 import { mapStream } from 'utils/stream';
 
 import { Sheet } from 'models';
-
-const DB_CORD19 = mongoose.__openConnection('cord19');
 
 export async function search(ctx) {
 	const params = ctx.query;
@@ -54,40 +57,20 @@ export async function getSheetRows(ctx) {
 		{ $project: { row: '$rows' } }
 	]).cursor({ batchSize: 3 }).exec();
 
-	const cordRefBuffer = {};
+	const refPopulateStream = cordRowPopulation().stream;
 
-	const cordRefGetter = async(val) => {
-		if (cordRefBuffer[val] !== undefined) {
-			return cordRefBuffer[val];
-		}
+	let resStream = dbStream.pipe(refPopulateStream);
 
-		const refDoc = await DB_CORD19.collection('v19').findOne({
-			cord_uid: val
-		});
+	if (ctx.query.transform === 'public') {
+		const pbl = publicRownTrasnform(sheet);
 
-		if (refDoc) {
-			cordRefBuffer[val] = resolveHttpProtocol(refDoc['doi']);
-		} else {
-			cordRefBuffer[val] = null;
-		}
+		ctx.payload.header = pbl.header;
 
-		return cordRefBuffer[val];
-	};
-
-	const refPopulateStream = mapStream(async({ row }) => {
-		row.cells = await Promise.map(row.cells, async cell => {
-			if (cell.t === 'cord_ref') {
-				cell.link = await cordRefGetter(cell.v);
-			}
-
-			return cell;
-		}, { concurrency: 5 });
-
-		return row;
-	});
+		resStream = resStream.pipe(pbl.stream);
+	}
 
 	ctx.jsonStream = true;
-	ctx.body = dbStream.pipe(refPopulateStream);
+	ctx.body = resStream;
 }
 
 export async function deleteById(ctx) {
@@ -99,23 +82,34 @@ export async function exportCSV(ctx) {
 	const sheet = ctx.state.sheet;
 	const csvStream = csv.format();
 
+	const dbStream = Sheet.aggregate([
+		{ $match: { _id: sheet._id } },
+		{ $unwind: '$rows' },
+		{ $project: { row: '$rows' } }
+	]).cursor({ batchSize: 3 }).exec();
+
+	const refPopulateStream = cordRowPopulation().stream;
+
+	let resStream = dbStream.pipe(refPopulateStream);
+	let csvHeader = sheet.header;
+
+	if (ctx.query.transform === 'public') {
+		const pbl = publicRownTrasnform(sheet);
+
+		csvHeader = pbl.header;
+		resStream = resStream.pipe(pbl.stream);
+	}
+
+	resStream = resStream.pipe(mapStream(row => {
+		return row.cells.map(cell => _get(cell, 'v', ''));
+	}));
+
+	csvStream.write(csvHeader);
+
 	ctx.set('content-disposition', `attachment; filename=${sheet.title}.csv`);
 	ctx.set('content-type', 'text/csv');
 	ctx.rawBody = true;
-	ctx.body = csvStream;
-
-	(async() => {
-		csvStream.write(sheet.header);
-
-		for(let row of sheet.rows) {
-			csvStream.write(row.cells.map(cell => _get(cell, 'v', '')));
-			await Promise.delay(1);
-		}
-
-		csvStream.end();
-	})().catch(err => {
-		csvStream.emit('error', err);
-	});
+	ctx.body = resStream.pipe(csvStream);
 }
 
 export async function exportAll(ctx) {
@@ -210,12 +204,4 @@ export async function replaceRowsByPlainText(ctx) {
 	await sheet.save();
 
 	ctx.body = sheet.toJSON({ virtuals: true });
-}
-
-function resolveHttpProtocol(str, defProtocol ='http') {
-	if (/^http/.test(str)) {
-		return str;
-	}
-
-	return `${defProtocol}://${str}`;
 }

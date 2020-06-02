@@ -1,5 +1,6 @@
 // npm run console -- export-csv
 
+import Promise from 'bluebird';
 import path from 'path';
 import glob from 'glob';
 import * as csv from '@fast-csv/parse';
@@ -22,6 +23,8 @@ script.on('complete', () => mongoose.disconnect());
 export default script;
 
 async function doWork(params) {
+	await Promise.delay(5000);
+
 	const listPath = path.resolve('app_console', 'seeds', params.f);
 	const listFiles = glob.sync(listPath);
 

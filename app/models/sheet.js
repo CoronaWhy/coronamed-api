@@ -5,9 +5,7 @@ import Promise from 'bluebird';
 
 import { castCellType } from 'services/sheets';
 
-const DB_CORD19 = process.env.NODE_ENV === 'development'
-	? mongoose
-	: mongoose.__openConnection('cord19');
+const DB_CORD19 = mongoose.__openConnection('cord19');
 
 const Mixed = mongoose.Schema.Types.Mixed;
 
@@ -92,6 +90,19 @@ Schema.virtual('nextRowID').get(function() {
 	return sheet.isFirstRecordZero
 		? sheet.rows.length - 1
 		: sheet.rows.length;
+});
+
+Schema.virtual('headerIdxMap').get(function() {
+	const sheet = this;
+	const result = {};
+
+	if (sheet.header && sheet.header.length > 0) {
+		sheet.header.forEach((headerName, headerIdx) => {
+			result[headerName] = headerIdx;
+		});
+	}
+
+	return result;
 });
 
 Schema.methods.addRow = function sheetAddRow(returnRow) {
@@ -263,6 +274,30 @@ Schema.methods.replaceWithArray = async function sheetReplaceWithArray(arr) {
 	sheet.rows = [];
 
 	await sheet.joinArray(arr);
+};
+
+Schema.methods.getCellIndexByName = function(headerName) {
+	let idx = this.headerIdxMap[headerName];
+
+	if (typeof idx === 'number') {
+		return idx;
+	}
+
+	return -1;
+};
+
+Schema.methods.getCell = function(rowId, cellId) {
+	const sheet = this;
+
+	if (typeof cellId === 'string') {
+		cellId = sheet.getCellIndexByName(cellId);
+	}
+
+	if (cellId < 0) {
+		return null;
+	}
+
+	return _get(sheet.rows, [rowId, cellId], null);
 };
 
 const Sheet = DB_CORD19.model('Sheet', Schema);
