@@ -7,10 +7,10 @@ export default function publicRownTrasnform(sheet) {
 	const publicHeader = [
 		(sheetHeader[0] || 'ID'),
 		'Date',
+		'Study',
 		'Severe',
 		'Fatality',
 		'Study type',
-		'Sample',
 		'Sample Size',
 		'Study population'
 	];
@@ -45,7 +45,14 @@ export default function publicRownTrasnform(sheet) {
 				_get(urlCell, 'v')
 			);
 
-			const urlTitle = _get(cell('Journal'), 'v', 'link');
+			const titleCell = _get(cell('Title'), 'v');
+			let journalCell = _get(cell('Journal'), 'v');
+
+			if (journalCell) journalCell = `(${journalCell})`;
+
+			const urlTitle = [titleCell, journalCell]
+				.filter(v => v && v.length)
+				.join(' ');
 
 			if (typeof urlLink === 'string' && /^http/.test(urlLink)) {
 				return { v: urlLink, t: 'url', title: urlTitle };
@@ -134,16 +141,29 @@ export default function publicRownTrasnform(sheet) {
 			};
 		})();
 
+		const studyTypeCellValue = (
+			_get(cell('Study type'), 'v') ||
+			_get(cell('Design'), 'v') ||
+			''
+		);
+
 		row.cells = [
 			cell('ID', emptyCell),
 			dateCell,
 			studyCell,
 			severeCell,
 			fatalityCell,
-			cell('Study type', emptyCell),
+			{ v: studyTypeCellValue, t: 'string' },
 			cell('Sample Size') || cell('Sample') || emptyCell,
 			cell('Study population', emptyCell)
-		];
+		].map(cell => {
+			// Null values should be represented in a different way that is less likely to be confused with the word “No”.  I suggest blank cells or hyphens.
+			if (typeof cell.v === 'string' && !cell.v.length) {
+				cell.v = '-';
+			}
+
+			return cell;
+		});
 
 		return row;
 	});
