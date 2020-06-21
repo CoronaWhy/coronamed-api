@@ -66,9 +66,18 @@ export default function publicRownTrasnform(sheet) {
 			const parts = [];
 
 			const severeInfo = [
-				_get(cell('Severe Calculated'), 'v'),
-				_get(cell('Critical only'), 'v'),
-				_get(cell('Severe Adjusted'), 'v'),
+				// if Critical Only == “Y” --> put a double cross  at the beginning of the Severe column
+				_get(cell('Critical only'), 'v', '')
+					.replace(/^Y$/i, '‡')
+				,
+				// if Severe Adjusted == “Not Adjusted” --> put a double S at the beginning of the Severe column
+				_get(cell('Severe Adjusted'), 'v', '')
+					.replace(/^Not Adjusted$/i, '§')
+				,
+				// if “Severe Calculated” == “Calculated” --> put a single cross at the beginning  the Severe column
+				_get(cell('Severe Calculated'), 'v', '')
+					.replace(/^Calculated$/i, '†')
+				,
 				_get(cell('Severe'), 'v')
 			].filter(v => !isEmpty(v)).join(' ').trim();
 
@@ -91,9 +100,21 @@ export default function publicRownTrasnform(sheet) {
 				parts.push(`p=${pValue}`);
 			}
 
+			const severeSignificant = _get(cell('Severe Significant'), 'v', '')
+				.toLowerCase();
+
+			let bgColor = null;
+
+			if (severeSignificant === 'significant') {
+				bgColor = 'red';
+			} else if (severeSignificant === 'not significant') {
+				bgColor = 'green';
+			}
+
 			return {
 				v: parts.join(', ').trim(),
 				t: 'string',
+				bgColor,
 				severeInfo,
 				severeRange,
 				pValue,
@@ -106,9 +127,21 @@ export default function publicRownTrasnform(sheet) {
 			const parts = [];
 
 			const fatalityInfo = [
-				_get(cell('Fatality Calculated'), 'v'),
-				_get(cell('Discharged vs. death?'), 'v'),
-				_get(cell('Fatality Adjusted'), 'v'),
+				// if Fatality Adjusted == “Not Adjusted” --> put a double S at the beginning of the Fatality column
+				_get(cell('Fatality Adjusted'), 'v', '')
+					.replace(/^Not Adjusted$/i, '§')
+				,
+				// if “Fatality Calculated” == “Calcluated” --> put a single cross at the beginning of the Fatality column
+				_get(cell('Fatality Calculated'), 'v', '')
+					.replace(/^Calcluated$/i, '†')
+				,
+				// if “Discharged vs. death?” == “Y” --> put a little square at the beginning of the Fatality column
+				(
+					_get(cell('Discharged vs. death?'), 'v', '') ||
+					_get(cell('Discharge vs. death?'), 'v', '')
+				)
+					.replace(/^Y$/i, '□')
+				,
 				_get(cell('Fatality'), 'v')
 			].filter(v => !isEmpty(v)).join(' ').trim();
 
@@ -131,10 +164,22 @@ export default function publicRownTrasnform(sheet) {
 				parts.push(`p=${pValue}`);
 			}
 
+			const fatalitySignificant = _get(cell('Fatality Significant'), 'v', '')
+				.toLowerCase();
+
+			let bgColor = null;
+
+			if (fatalitySignificant === 'significant') {
+				bgColor = 'red';
+			} else if (fatalitySignificant === 'not significant') {
+				bgColor = 'green';
+			}
+
 			return {
 				v: parts.join(', ').trim(),
 				t: 'string',
 				_id: null,
+				bgColor,
 				fatalityInfo,
 				fatalityRange,
 				pValue
@@ -175,5 +220,5 @@ export default function publicRownTrasnform(sheet) {
 }
 
 function isEmpty(v) {
-	return v === undefined || v === null || v === '';
+	return v === undefined || v === null || v === '' || v === 'N';
 }
