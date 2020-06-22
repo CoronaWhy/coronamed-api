@@ -67,17 +67,23 @@ export default function publicRownTrasnform(sheet) {
 
 			const severeInfo = [
 				// if Critical Only == “Y” --> put a double cross  at the beginning of the Severe column
-				_get(cell('Critical only'), 'v', '')
-					.replace(/^Y$/i, '‡')
-				,
+				pickStr(
+					_get(cell('Critical only'), 'v', '')
+						.replace(/^Y$/i, '‡'),
+					['‡']
+				),
 				// if Severe Adjusted == “Not Adjusted” --> put a double S at the beginning of the Severe column
-				_get(cell('Severe Adjusted'), 'v', '')
-					.replace(/^Not Adjusted$/i, '§')
-				,
+				pickStr(
+					_get(cell('Severe Adjusted'), 'v', '')
+						.replace(/^Not Adjusted$/i, '§'),
+					['§']
+				),
 				// if “Severe Calculated” == “Calculated” --> put a single cross at the beginning  the Severe column
-				_get(cell('Severe Calculated'), 'v', '')
-					.replace(/^Calculated$/i, '†')
-				,
+				pickStr(
+					_get(cell('Severe Calculated'), 'v', '')
+						.replace(/^Calculated$/i, '†'),
+					['†']
+				),
 				_get(cell('Severe'), 'v')
 			].filter(v => !isEmpty(v)).join(' ').trim();
 
@@ -128,19 +134,22 @@ export default function publicRownTrasnform(sheet) {
 
 			const fatalityInfo = [
 				// if Fatality Adjusted == “Not Adjusted” --> put a double S at the beginning of the Fatality column
-				_get(cell('Fatality Adjusted'), 'v', '')
-					.replace(/^Not Adjusted$/i, '§')
-				,
+				pickStr(
+					_get(cell('Fatality Adjusted'), 'v', '')
+						.replace(/^Not Adjusted$/i, '§'),
+					['§']
+				),
 				// if “Fatality Calculated” == “Calcluated” --> put a single cross at the beginning of the Fatality column
-				_get(cell('Fatality Calculated'), 'v', '')
-					.replace(/^Calcluated$/i, '†')
-				,
+				pickStr(
+					_get(cell('Fatality Calculated'), 'v', '')
+						.replace(/^Calcluated$/i, '†'),
+					['†']
+				),
 				// if “Discharged vs. death?” == “Y” --> put a little square at the beginning of the Fatality column
-				(
+				pickStr((
 					_get(cell('Discharged vs. death?'), 'v', '') ||
 					_get(cell('Discharge vs. death?'), 'v', '')
-				)
-					.replace(/^Y$/i, '□')
+				).replace(/^Y$/i, '□'), ['□'])
 				,
 				_get(cell('Fatality'), 'v')
 			].filter(v => !isEmpty(v)).join(' ').trim();
@@ -221,4 +230,8 @@ export default function publicRownTrasnform(sheet) {
 
 function isEmpty(v) {
 	return v === undefined || v === null || v === '' || v === 'N';
+}
+
+function pickStr(str, values, thenValue = '') {
+	return values.indexOf(str) > -1 ? str : thenValue;
 }

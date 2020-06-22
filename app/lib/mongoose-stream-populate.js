@@ -1,42 +1,81 @@
 import mongoose from 'mongoose';
 import _get from 'lodash/get';
 import _set from 'lodash/set';
+import _keyBy from 'lodash/keyBy';
+import _uniq from 'lodash/uniq';
 
-import { mapStream } from 'utils/stream';
+import { mapStream, trasnformToBatchStream, streamCombiner } from 'utils/stream';
 
-export default function mongooseStreamPopulate(modelName, keyPath, select) {
+export default function mongooseStreamPopulate(
+	modelName,
+	keyPath,
+	select
+) {
+	let batchSize = 10;
+	let read, lean;
+
+	if (arguments[0] && typeof arguments[0] === 'object') {
+		modelName = arguments[0].modelName;
+		keyPath = arguments[0].keyPath;
+		select = arguments[0].select;
+		batchSize = arguments[0].batchSize || batchSize;
+		read = arguments[0].read;
+		lean = arguments[0].lean;
+	}
+
 	const Model = mongoose.model(modelName);
-	const modelCacheMap = {};
+	const cacheMap = {};
 
-	const fetchResource = async (id, select) => {
-		if (modelCacheMap[id] !== undefined) {
-			return modelCacheMap[id];
+	const fetchResources = async(resourceIds) => {
+		resourceIds = resourceIds.filter(id => cacheMap[id] === undefined);
+
+		if (!resourceIds.length) {
+			return;
 		}
 
-		const query = Model.findById(id).lean();
-
-		if (select) {
-			query.select(select);
+		for (let resourceId of resourceIds) {
+			cacheMap[resourceId] = null;
 		}
 
-		const obj = await query;
-		const result = obj || null;
+		const query = Model.find({ _id: { $in: resourceIds } });
 
-		modelCacheMap[id] = result;
-		return result;
+		if (lean !== false) query.lean();
+		if (read) query.read(read);
+		if (select) query.select(select);
+
+		const list = await query;
+		const resourceMap = _keyBy(list, '_id');
+
+		Object.assign(cacheMap, resourceMap);
 	};
 
-	return mapStream(async obj => {
-		const resourceId = _get(obj, keyPath);
+	const streamBatch = trasnformToBatchStream({ size: batchSize });
+	const streamMap = mapStream(async batch => {
+		const resourceIds = _uniq(
+			batch.map(obj => _get(obj, keyPath)).flat()
+		);
 
-		if (!resourceId) {
-			_set(obj, keyPath, null);
-			return obj;
+		while(resourceIds.length > 0) {
+			const ids = resourceIds.splice(0, batchSize);
+
+			await fetchResources(ids);
 		}
 
-		const resource = await fetchResource(resourceId, select);
-		_set(obj, keyPath, resource);
+		for (let obj of batch) {
+			let resourceValue = _get(obj, keyPath);
+			let result = null;
 
-		return obj;
-	});
+			if (Array.isArray(resourceValue)) {
+				result = resourceValue.map(id => cacheMap[id] || null);
+			} else {
+				result = cacheMap[resourceValue] || null;
+			}
+
+			_set(obj, keyPath, result || null);
+		}
+
+		return batch;
+	}, { flatMode: true });
+
+	return streamCombiner(streamBatch, streamMap);
 }

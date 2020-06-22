@@ -55,6 +55,7 @@
 		"mw-pagination": "git+https://workerco:3aXno3LwK6gnBcPyEdDrVgIaJ2phG9II@bitbucket.org/workerco/mw-pagination.git#master",
 		"prettyjson": "^1.2.1",
 		"pug": "^2.0.4",
+		"through2": "^3.0.1",
 		"uuid": "^3.4.0",
 		"winston": "^3.2.0",
 		"winston-daily-rotate-file": "^3.10.0"

@@ -1,47 +1,78 @@
-import Promise from 'bluebird';
-import { mapStream } from 'utils/stream';
+import _get from 'lodash/get';
+import { mapStream, trasnformToBatchStream, streamCombiner } from 'utils/stream';
 
 import mongoose from 'lib/mongoose';
 
 const DB_CORD19 = mongoose.__openConnection('cord19');
 
 export default function cordRowPopulation() {
-	const cordRefBuffer = {};
+	const cacheMap = {};
+	const batchSize = 10;
 
-	const cordRefGetter = async(val) => {
-		if (cordRefBuffer[val] !== undefined) {
-			return cordRefBuffer[val];
+	const fetchResources = async(ids) => {
+		ids = ids.filter(id => cacheMap[id] === undefined);
+
+		if (!ids.length) {
+			return;
 		}
 
-		const refDoc = await DB_CORD19.collection('v19').findOne({
-			cord_uid: val
+		for (let resourceId of ids) {
+			cacheMap[resourceId] = null;
+		}
+
+		const list = await DB_CORD19.collection('v19').find({
+			cord_uid: { $in: ids }
+		}, { doi: 1 }).toArray();
+
+		list.forEach(v => {
+			const link = resolveHttpProtocol(v.doi);
+			cacheMap[v['cord_uid']] = link;
 		});
-
-		if (refDoc) {
-			cordRefBuffer[val] = resolveHttpProtocol(refDoc['doi']);
-		} else {
-			cordRefBuffer[val] = null;
-		}
-
-		return cordRefBuffer[val];
 	};
 
-	const transformStream = mapStream(async data => {
-		const row = data.row || data;
+	const streamBatch = trasnformToBatchStream({ size: batchSize });
+	const streamMap = mapStream(async batch => {
+		const resourceIdsMap = {};
+		const resourceAssignMap = {};
+		const rows = [];
 
-		row.cells = await Promise.map(row.cells, async cell => {
-			if (cell.t === 'cord_ref') {
-				cell.link = await cordRefGetter(cell.v);
+		for (let rowIdx = 0; rowIdx < batch.length; rowIdx++) {
+			const row = batch[rowIdx].row || batch[rowIdx];
+			const cells = _get(row, 'cells', []);
+
+			rows.push(row);
+
+			for (let cellIdx = 0; cellIdx < cells.length; cellIdx++) {
+				const cell = cells[cellIdx];
+
+				if (cell.t === 'cord_ref') {
+					resourceIdsMap[cell.v] = true;
+					resourceAssignMap[`${rowIdx}:${cellIdx}`] = cell.v;
+				}
 			}
+		}
 
-			return cell;
-		}, { concurrency: 5 });
+		const resourceIds = Object.keys(resourceIdsMap);
 
-		return row;
-	});
+		while(resourceIds.length > 0) {
+			const ids = resourceIds.splice(0, batchSize);
+			await fetchResources(ids);
+		}
+
+		for(let pattern of Object.keys(resourceAssignMap)) {
+			const cordUid = resourceAssignMap[pattern];
+			const [rowIdx, cellIdx] = pattern.split(':').map(v => parseInt(v));
+
+			const resourceValue = cacheMap[cordUid] || null;
+
+			rows[rowIdx].cells[cellIdx].link = resourceValue;
+		}
+
+		return rows;
+	}, { flatMode: true });
 
 	return {
-		stream: transformStream
+		stream: streamCombiner(streamBatch, streamMap)
 	};
 }
 
