@@ -112,9 +112,9 @@ export default function publicRownTrasnform(sheet) {
 			let bgColor = null;
 
 			if (severeSignificant === 'significant') {
-				bgColor = 'red';
-			} else if (severeSignificant === 'not significant') {
 				bgColor = 'green';
+			} else if (severeSignificant === 'not significant') {
+				bgColor = 'red';
 			}
 
 			return {
@@ -179,9 +179,9 @@ export default function publicRownTrasnform(sheet) {
 			let bgColor = null;
 
 			if (fatalitySignificant === 'significant') {
-				bgColor = 'red';
-			} else if (fatalitySignificant === 'not significant') {
 				bgColor = 'green';
+			} else if (fatalitySignificant === 'not significant') {
+				bgColor = 'red';
 			}
 
 			return {
