@@ -76,10 +76,10 @@ export default function cordRowPopulation() {
 	};
 }
 
-function resolveHttpProtocol(str, defProtocol ='http') {
+function resolveHttpProtocol(str, defProtocol ='https') {
 	if (/^http/.test(str)) {
 		return str;
 	}
 
-	return `${defProtocol}://${str}`;
+	return `${defProtocol}://doi.org/${str}`;
 }
